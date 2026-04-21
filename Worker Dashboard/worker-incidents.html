@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmly - Report Incident</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="templatemo-glass-admin-style.css">
+    <style>
+        .incident-form-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 28px;
+            backdrop-filter: blur(20px);
+            margin-bottom: 24px;
+        }
+        .form-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-section-title::after { content: ''; flex: 1; height: 1px; background: var(--glass-border); }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-grid.full { grid-template-columns: 1fr; }
+        @media(max-width:640px) { .form-grid { grid-template-columns: 1fr; } }
+
+        .form-group-w { margin-bottom: 16px; }
+        .form-label-w { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 7px; display: block; }
+        .form-label-w span { color: var(--danger); margin-left: 2px; }
+        .form-input-w, .form-select-w, .form-textarea-w {
+            width: 100%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            transition: border-color var(--transition-fast);
+        }
+        .form-input-w:focus, .form-select-w:focus, .form-textarea-w:focus {
+            outline: none;
+            border-color: var(--emerald-light);
+        }
+        .form-input-w::placeholder, .form-textarea-w::placeholder { color: var(--text-muted); }
+        .form-select-w option { background: #132419; }
+        .form-textarea-w { resize: vertical; min-height: 100px; line-height: 1.6; }
+
+        /* Severity selector */
+        .severity-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .severity-option {
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .severity-option:hover { background: var(--glass-hover); }
+        .severity-option.selected-low { border-color: var(--success); background: rgba(34,197,94,0.08); }
+        .severity-option.selected-medium { border-color: var(--warning); background: rgba(234,179,8,0.08); }
+        .severity-option.selected-high { border-color: var(--danger); background: rgba(220,38,38,0.08); }
+        .severity-emoji { font-size: 22px; margin-bottom: 6px; }
+        .severity-label { font-size: 13px; font-weight: 600; }
+        .severity-desc { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+        /* File upload */
+        .file-upload-area { border: 2px dashed var(--glass-border); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all var(--transition-fast); }
+        .file-upload-area:hover { border-color: var(--emerald-light); background: rgba(52,211,153,0.05); }
+        .file-upload-area p { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+
+        /* Submit btn */
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(5,150,105,0.25);
+            border: 1px solid rgba(52,211,153,0.4);
+            color: var(--emerald-light);
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .submit-btn:hover { background: rgba(5,150,105,0.4); transform: translateY(-1px); }
+        .submit-btn svg { width: 18px; height: 18px; }
+
+        /* Previous reports */
+        .report-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 16px 18px;
+            margin-bottom: 10px;
+            backdrop-filter: blur(20px);
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+        .report-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .report-icon svg { width: 18px; height: 18px; }
+        .report-icon.high { background: rgba(220,38,38,0.15); color: #f87171; }
+        .report-icon.medium { background: rgba(234,179,8,0.15); color: var(--warning); }
+        .report-icon.low { background: rgba(34,197,94,0.15); color: var(--success); }
+        .report-info { flex: 1; }
+        .report-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+        .report-meta { font-size: 12px; color: var(--text-muted); display: flex; gap: 10px; flex-wrap: wrap; }
+        .report-status { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; flex-shrink: 0; }
+        .report-status.open { background: rgba(234,179,8,0.15); color: var(--warning); border: 1px solid rgba(234,179,8,0.2); }
+        .report-status.resolved { background: rgba(34,197,94,0.15); color: var(--success); border: 1px solid rgba(34,197,94,0.2); }
+        .report-status.reviewing { background: rgba(14,165,233,0.15); color: var(--info); border: 1px solid rgba(14,165,233,0.2); }
+
+        .section-title { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: var(--glass-border); }
+
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--bg-gradient-2); border: 1px solid var(--glass-border); border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; min-width: 280px; animation: toastIn 0.3s ease; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        @keyframes toastIn { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
+        .toast-icon { width: 20px; height: 20px; flex-shrink: 0; }
+        .toast-text { font-size: 13px; }
+        .toast.success .toast-icon { color: var(--success); }
+
+        /* Confirmation overlay */
+        .confirm-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .confirm-overlay.open { display: flex; }
+        .confirm-card {
+            background: var(--bg-gradient-2);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 36px 28px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            animation: modalIn 0.25s ease;
+        }
+        @keyframes modalIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+        .confirm-icon { width: 64px; height: 64px; background: rgba(34,197,94,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+        .confirm-icon svg { width: 30px; height: 30px; color: var(--success); }
+        .confirm-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .confirm-sub { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px; }
+        .confirm-ref { font-family: 'Space Mono', monospace; font-size: 16px; color: var(--emerald-light); font-weight: 700; background: rgba(52,211,153,0.1); padding: 8px 20px; border-radius: 8px; display: inline-block; margin-bottom: 24px; }
+        .confirm-btn { padding: 11px 28px; border-radius: 10px; background: rgba(5,150,105,0.25); border: 1px solid rgba(52,211,153,0.4); color: var(--emerald-light); font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); }
+        .confirm-btn:hover { background: rgba(5,150,105,0.4); }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="dashboard">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <svg viewBox="0 0 40 40" fill="none" width="36" height="36">
+                        <circle cx="20" cy="20" r="20" fill="rgba(5,150,105,0.2)"/>
+                        <path d="M8 28 Q14 14 20 20 Q26 26 32 12" stroke="#34d399" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <circle cx="20" cy="20" r="3" fill="#d4a574"/>
+                    </svg>
+                </div>
+                <span class="logo-text">Farmly</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-section">
+                    <span class="nav-section-title">Worker Menu</span>
+                    <ul>
+                        <li class="nav-item"><a href="worker-dashboard.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                            Dashboard
+                        </a></li>
+                        <li class="nav-item"><a href="worker-tasks.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+                            My Tasks
+                        </a></li>
+                        <li class="nav-item"><a href="worker-equipment.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                            Equipment Usage
+                        </a></li>
+                        <li class="nav-item"><a href="worker-incidents.html" class="nav-link active">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            Report Incident
+                        </a></li>
+                    </ul>
+                </li>
+                <li class="nav-section">
+                    <span class="nav-section-title">Account</span>
+                    <ul>
+                        <li class="nav-item"><a href="register.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                            Logout
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <nav class="navbar">
+                <h1 class="page-title">Report Incident</h1>
+                <div class="navbar-right">
+                    <button class="nav-btn" id="theme-toggle">
+                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Report Form -->
+            <div class="incident-form-card">
+                <div class="form-section-title">Incident Details</div>
+
+                <div class="form-grid">
+                    <div class="form-group-w">
+                        <label class="form-label-w">Incident Type <span>*</span></label>
+                        <select class="form-select-w" id="incidentType">
+                            <option value="">— Select type —</option>
+                            <option>🐛 Pest / Disease outbreak</option>
+                            <option>💧 Irrigation failure / Water leak</option>
+                            <option>🔧 Equipment breakdown</option>
+                            <option>🌿 Crop damage / Loss</option>
+                            <option>🤕 Worker injury / Near miss</option>
+                            <option>🌦 Weather damage</option>
+                            <option>🔒 Security concern</option>
+                            <option>⚠ Other field issue</option>
+                        </select>
+                    </div>
+                    <div class="form-group-w">
+                        <label class="form-label-w">Location <span>*</span></label>
+                        <select class="form-select-w" id="incidentLocation">
+                            <option value="">— Select area —</option>
+                            <option>Field A — Spinach</option>
+                            <option>Field B — Mixed Veg</option>
+                            <option>Block C — Maize</option>
+                            <option>Greenhouse — Tomatoes</option>
+                            <option>Compost Area A</option>
+                            <option>Pump House</option>
+                            <option>Equipment Shed</option>
+                            <option>Farm Perimeter</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group-w">
+                        <label class="form-label-w">Date of Incident <span>*</span></label>
+                        <input type="date" class="form-input-w" id="incidentDate">
+                    </div>
+                    <div class="form-group-w">
+                        <label class="form-label-w">Time of Incident</label>
+                        <input type="time" class="form-input-w" id="incidentTime">
+                    </div>
+                </div>
+
+                <div class="form-group-w">
+                    <label class="form-label-w">Brief Title / Summary <span>*</span></label>
+                    <input type="text" class="form-input-w" id="incidentTitle" placeholder="e.g. Aphid infestation found on spinach rows 3–5">
+                </div>
+
+                <div class="form-section-title" style="margin-top:8px;">Severity Level</div>
+
+                <div class="severity-selector" style="margin-bottom:20px;">
+                    <div class="severity-option" id="sev-low" onclick="selectSeverity('low')">
+                        <div class="severity-emoji">🟢</div>
+                        <div class="severity-label">Low</div>
+                        <div class="severity-desc">Minor, no immediate action</div>
+                    </div>
+                    <div class="severity-option selected-medium" id="sev-medium" onclick="selectSeverity('medium')">
+                        <div class="severity-emoji">🟡</div>
+                        <div class="severity-label">Medium</div>
+                        <div class="severity-desc">Needs attention soon</div>
+                    </div>
+                    <div class="severity-option" id="sev-high" onclick="selectSeverity('high')">
+                        <div class="severity-emoji">🔴</div>
+                        <div class="severity-label">High</div>
+                        <div class="severity-desc">Urgent — farm owner alerted</div>
+                    </div>
+                </div>
+
+                <div class="form-section-title">Full Description</div>
+
+                <div class="form-group-w">
+                    <label class="form-label-w">What happened? <span>*</span></label>
+                    <textarea class="form-textarea-w" id="incidentDesc" placeholder="Describe what you observed, when it started, what may have caused it, and how widespread the problem is. Include any relevant measurements or estimates."></textarea>
+                </div>
+
+                <div class="form-group-w">
+                    <label class="form-label-w">Immediate Action Taken</label>
+                    <textarea class="form-textarea-w" style="min-height:80px;" id="actionTaken" placeholder="What did you do immediately after discovering the incident? (e.g. isolated area, stopped irrigation, applied first aid)"></textarea>
+                </div>
+
+                <div class="form-section-title">Photo Evidence</div>
+
+                <div class="form-group-w">
+                    <label class="file-upload-area" for="incidentPhoto">
+                        <div style="color:var(--emerald-light); margin-bottom:8px;">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        </div>
+                        <p>Tap to attach photos</p>
+                        <p style="font-size:11px; margin-top:4px;">Up to 5 photos · JPG, PNG · 10MB max each</p>
+                        <input type="file" id="incidentPhoto" accept="image/*" multiple style="display:none" onchange="previewIncidentPhotos(event)">
+                    </label>
+                    <div id="photoGrid" style="display:grid; grid-template-columns: repeat(3,1fr); gap:8px; margin-top:10px;"></div>
+                </div>
+
+                <button class="submit-btn" onclick="submitIncident()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Submit Incident Report
+                </button>
+            </div>
+
+            <!-- Previous Reports -->
+            <div class="section-title">My Previous Reports</div>
+
+            <div class="report-card">
+                <div class="report-icon high">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+                </div>
+                <div class="report-info">
+                    <div class="report-title">Irrigation pipe burst — Block C east side</div>
+                    <div class="report-meta">
+                        <span>🗓 18 Apr 2026</span>
+                        <span>📍 Block C — Maize</span>
+                        <span>🔴 High severity</span>
+                    </div>
+                </div>
+                <span class="report-status reviewing">Under Review</span>
+            </div>
+
+            <div class="report-card">
+                <div class="report-icon medium">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+                </div>
+                <div class="report-info">
+                    <div class="report-title">Aphid infestation detected on spinach rows 3–5</div>
+                    <div class="report-meta">
+                        <span>🗓 15 Apr 2026</span>
+                        <span>📍 Field A — Spinach</span>
+                        <span>🟡 Medium severity</span>
+                    </div>
+                </div>
+                <span class="report-status open">Open</span>
+            </div>
+
+            <div class="report-card">
+                <div class="report-icon low">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+                </div>
+                <div class="report-info">
+                    <div class="report-title">Compost bin lid broken — Bay 2</div>
+                    <div class="report-meta">
+                        <span>🗓 10 Apr 2026</span>
+                        <span>📍 Compost Area A</span>
+                        <span>🟢 Low severity</span>
+                    </div>
+                </div>
+                <span class="report-status resolved">Resolved</span>
+            </div>
+        </main>
+    </div>
+
+    <button class="mobile-menu-toggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+    </button>
+
+    <!-- Submission Confirmation Overlay -->
+    <div class="confirm-overlay" id="confirmOverlay">
+        <div class="confirm-card">
+            <div class="confirm-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="confirm-title">Report Submitted!</div>
+            <div class="confirm-sub">Your incident report has been sent to the farm owner and team leader. They will review it shortly.</div>
+            <div class="confirm-ref" id="refNumber">REF: INC-2026-0047</div>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px;">You will be notified when the report is reviewed or actioned.</p>
+            <button class="confirm-btn" onclick="closeConfirm()">Back to Incidents</button>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="templatemo-glass-admin-script.js"></script>
+    <script>
+        let selectedSeverity = 'medium';
+
+        // Set today's date and time
+        const now = new Date();
+        document.getElementById('incidentDate').value = now.toISOString().split('T')[0];
+        document.getElementById('incidentTime').value = now.toTimeString().slice(0,5);
+
+        function selectSeverity(level) {
+            selectedSeverity = level;
+            ['low','medium','high'].forEach(s => {
+                const el = document.getElementById(`sev-${s}`);
+                el.className = 'severity-option';
+                if (s === level) el.classList.add(`selected-${s}`);
+            });
+        }
+
+        function previewIncidentPhotos(e) {
+            const grid = document.getElementById('photoGrid');
+            grid.innerHTML = '';
+            Array.from(e.target.files).slice(0,5).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    const img = document.createElement('img');
+                    img.src = ev.target.result;
+                    img.style.cssText = 'width:100%; height:80px; object-fit:cover; border-radius:8px; border:1px solid var(--glass-border);';
+                    grid.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function submitIncident() {
+            const title = document.getElementById('incidentTitle').value.trim();
+            const type = document.getElementById('incidentType').value;
+            const loc = document.getElementById('incidentLocation').value;
+            const desc = document.getElementById('incidentDesc').value.trim();
+
+            if (!title || !type || !loc || !desc) {
+                showToast('Please fill in all required fields', 'warn');
+                return;
+            }
+
+            // Generate a mock reference number
+            const refNum = `INC-2026-${String(Math.floor(Math.random()*90+10)).padStart(4,'0')}`;
+            document.getElementById('refNumber').textContent = `REF: ${refNum}`;
+            document.getElementById('confirmOverlay').classList.add('open');
+        }
+
+        function closeConfirm() {
+            document.getElementById('confirmOverlay').classList.remove('open');
+            // Reset form
+            document.getElementById('incidentTitle').value = '';
+            document.getElementById('incidentDesc').value = '';
+            document.getElementById('actionTaken').value = '';
+            document.getElementById('incidentType').value = '';
+            document.getElementById('incidentLocation').value = '';
+            document.getElementById('photoGrid').innerHTML = '';
+            selectSeverity('medium');
+        }
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success'
+                ? '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>'
+                : '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--warning)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>';
+            toast.innerHTML = `${icon}<span class="toast-text">${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+    </script>
+</body>
+</html>
