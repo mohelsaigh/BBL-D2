@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmly - Equipment Tracking (Owner)</title>
+    <meta name="description" content="3D Glassmorphism Dashboard Template by TemplateMo">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="templatemo-glass-admin-style.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="background"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <img src="../../Login and Register/Media/Images/Farmly-removebg-preview.png" alt="Farmly Logo" style="width:45px; height:45px; object-fit:contain; mix-blend-mode:screen;">
+                </div>
+                <span class="logo-text">Farmly</span>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-section">
+                    <span class="nav-section-title">Main Menu</span>
+                    <ul>
+                          <ul>
+                        <li class="nav-item">
+                            <a href="Task-Management.html" class="nav-link active">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                     <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                                    <rect x="9" y="3" width="6" height="4" rx="1" />
+                                    <line  x1="9" y1="12" x2="15" y2="15"/>
+                                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                                </svg>
+                                Task Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="Equipment-Tracking.html" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                </svg>
+                                Equipment Tracking
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="FieldIncidents.html" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="3" />
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                    </svg>
+
+                                Field Incidents
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href = "Reports.html" class="nav-link">
+                                <svg class ="nav-icon" viewbox="0 0 24 24" fill="none " stroke="currentColor">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                     <line x1="16" y1="17" x2="8" y2="17"/>
+                                </svg>
+                                Reports
+                            </a>
+                        </li>
+                    </ul>
+                     <li class="nav-section">
+                    <span class="nav-section-title">Account</span>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="../Login and Register/Login.html" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                                    <polyline points="10 17 15 12 10 7" />
+                                    <line x1="15" y1="12" x2="3" y2="12" />
+                                </svg>
+                                Login
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <nav class="navbar">
+                <div class="page-header">
+                    <h1 class="page-title">Equipment Tracking</h1>
+                    <div class="page-breadcrumb"><p>View & Manage Equipment Usage Records</p></div>
+                </div>
+                <div class="navbar-right">
+                    <button class="nav-btn" id="theme-toggle" title="Toggle Light/Dark Mode">
+                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/>
+                            <path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/>
+                            <path d="M2 12h2"/><path d="M20 12h2"/>
+                            <path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/>
+                        </svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Equipment Tracking Content -->
+            <div class="glass-card">
+                
+                <!-- Step 1 & 2: Select Equipment to View -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">Select Equipment to View</h3>
+                    <div class="form-grid">
+                        <div class="form-group-settings full-width">
+                            <label>Choose Equipment</label>
+                            <select class="settings-select">
+                                <option value="">Select Equipment</option>
+                                <option value="tractor"> Tractor - John Deere</option>
+                                <option value="harvester">Harvester - Case IH</option>
+                                <option value="pump"> Irrigation Pump</option>
+                                <option value="shears"> Pruning Shears</option>
+                                <option value="truck">Farm Truck</option>
+                                <option value="sprayer"> Sprayer</option>
+                            </select>
+                        </div>
+                        <div class="btn-group" style="grid-column: span 2;">
+                            <button class="btn btn-primary" style="width: auto;">View Equipment</button>
+                        </div>
+                    </div>
+                    <!-- Error: No equipment selected -->
+                    <div style="margin-top: 12px; background: rgba(220, 38, 38, 0.15); border: 1px solid #dc2626; border-radius: 12px; padding: 12px; color: #dc2626;">
+                        ⚠ Please select a piece of equipment.
+                    </div>
+                </div>
+
+                <!-- Step 3: Usage Records for Tractor -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title"> Usage Records - Tractor</h3>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>Equipment</th><th>Employee</th><th>Start Time</th><th>End Time</th><th>Duration</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Tractor</td>
+                                    <td>John Farmer</td>
+                                    <td>2024-03-15 08:00</td>
+                                    <td>2024-03-15 12:00</td>
+                                    <td>4 hours</td>
+                                    <td><span class="status-badge completed">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Tractor</td>
+                                    <td>Mike Operator</td>
+                                    <td>2024-03-16 07:30</td>
+                                    <td>2024-03-16 11:30</td>
+                                    <td>4 hours</td>
+                                    <td><span class="status-badge completed">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Tractor</td>
+                                    <td>John Farmer</td>
+                                    <td>2024-03-17 09:00</td>
+                                    <td>-</td>
+                                    <td>Running</td>
+                                    <td><span class="status-badge processing">Active</span></td>
+                                </tr>
+                            </tbody>
+                         </table>
+                    </div>
+                </div>
+
+                <!-- Step 3: Usage Records for Irrigation Pump -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">Usage Records - Irrigation Pump</h3>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>Equipment</th><th>Employee</th><th>Start Time</th><th>End Time</th><th>Duration</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Irrigation Pump</td>
+                                    <td>Mike Operator</td>
+                                    <td>2024-03-15 09:30</td>
+                                    <td>2024-03-15 14:30</td>
+                                    <td>5 hours</td>
+                                    <td><span class="status-badge completed">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Irrigation Pump</td>
+                                    <td>Nolawi</td>
+                                    <td>2024-03-16 10:00</td>
+                                    <td>2024-03-16 15:00</td>
+                                    <td>5 hours</td>
+                                    <td><span class="status-badge completed">Completed</span></td>
+                                </tr>
+                            </tbody>
+                         </table>
+                    </div>
+                </div>
+
+                <!-- Step 4: Filter Options -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">Step 4: Filter Records</h3>
+                    <div class="form-grid">
+                        <div class="form-group-settings">
+                            <label>Start Date</label>
+                            <input type="date">
+                        </div>
+                        <div class="form-group-settings">
+                            <label>End Date</label>
+                            <input type="date">
+                        </div>
+                        <div class="form-group-settings">
+                            <label>Filter by Employee</label>
+                            <select class="settings-select">
+                                <option value="">All Employees</option>
+                                <option value="John Farmer">John Farmer</option>
+                                <option value="Mike Operator">Mike Operator</option>
+                                <option value="Nolawi">Nolawi</option>
+                                <option value="Sarah Grower">Sarah Grower</option>
+                            </select>
+                        </div>
+                        <div class="btn-group" style="grid-column: span 2;">
+                            <button class="btn btn-secondary" style="width: auto;">Apply Filters</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No Records Found Message -->
+                <div class="settings-section">
+                    <div style="background: rgba(220, 38, 38, 0.15); border: 1px solid #dc2626; border-radius: 12px; padding: 12px; color: #dc2626;">
+                         No usage records found for this equipment.
+                    </div>
+                </div>
+
+                <!-- Step 5 & 6: Generate Equipment Report -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title"> Generate Equipment Report</h3>
+                    <div class="form-grid">
+                        <div class="form-group-settings full-width">
+                            <label>Report Format</label>
+                            <select class="settings-select">
+                                <option>PDF Document</option>
+                                <option>CSV Export</option>
+                                <option>Excel Spreadsheet</option>
+                            </select>
+                        </div>
+                        <div class="btn-group" style="grid-column: span 2;">
+                            <button class="btn btn-primary" style="width: auto; background: #059669;">Generate Equipment Report</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Report Generation Success -->
+                    <div style="margin-top: 16px; background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; border-radius: 12px; padding: 12px; color: #22c55e;">
+                        <strong> Usage Summary Report Generated Successfully!</strong><br>
+                        Total Equipment Usage: 127 hours | Most Used: Tractor (45 hours) | Active Sessions: 2
+                    </div>
+                    
+                    <!-- Report Generation Failure -->
+                    <div style="margin-top: 12px; background: rgba(220, 38, 38, 0.15); border: 1px solid #dc2626; border-radius: 12px; padding: 12px; color: #dc2626;">
+                         Report generation failed. Please try again.
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="templatemo-glass-admin-script.js"></script>
+</body>
+</html>
