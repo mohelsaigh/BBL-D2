@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmly - Task Management</title>
+    <meta name="description" content="3D Glassmorphism Dashboard Template by TemplateMo">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="templatemo-glass-admin-style.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="background"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+                        <div class="sidebar-header">
+                <div class="logo">
+                            <a href="index.html"> <img src="../../Login and Register/Media/Images/Farmly-removebg-preview.png" alt="Farmly Logo"
+                        style="width:45px; height:45px; object-fit:contain; mix-blend-mode:screen;"></a>
+                </div>
+                <span class="logo-text">Farmly</span>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-section">
+                    <span class="nav-section-title">Main Menu</span>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="Task-Management.html" class="nav-link active">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                                    <rect x="9" y="3" width="6" height="4" rx="1" />
+                                    <line x1="9" y1="12" x2="15" y2="15"/>
+                                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                                </svg>
+                                Task Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="Equipment-Tracking.html" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                </svg>
+                                Equipment Tracking
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="FieldIncidents.html" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3" />
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                                Field Incidents
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="Reports.html" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                </svg>
+                                Reports
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-section">
+                    <span class="nav-section-title">Account</span>
+                    <ul>
+                        <li class="nav-item">
+                            <a href="../Login and Register/Login.html" class="nav-link">
+                                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                                    <polyline points="10 17 15 12 10 7" />
+                                    <line x1="15" y1="12" x2="3" y2="12" />
+                                </svg>
+                                Login
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <nav class="navbar">
+                <div class="page-header">
+                    <h1 class="page-title">Task Management Hub</h1>
+                    <div class="page-breadcrumb">
+                        <p>Manage Employee Tasks</p>
+                    </div>
+                </div>
+                <div class="navbar-right">
+                    <button class="nav-btn" id="theme-toggle" title="Toggle Light/Dark Mode">
+                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/>
+                            <path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/>
+                            <path d="M2 12h2"/><path d="M20 12h2"/>
+                            <path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/>
+                        </svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Settings Content -->
+            <div class="settings-grid">
+                <!-- Settings Navigation -->
+                <div class="glass-card settings-nav-card">
+                    <h3 class="settings-section-title"> Task Management Actions </h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li class="settings-row" style="list-style: none;">
+                            <div class="settings-label">
+                                <span class="settings-label-title"><a href="Task-Management.html">Assign Task </a></span>
+                            </div>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <line x1="19" y1="8" x2="19" y2="14"/>
+                                <line x1="22" y1="11" x2="16" y2="11"/>
+                            </svg>
+                        </li>
+                        <li class="settings-row" style="list-style: none;">
+                            <div class="settings-label">
+                                <span class="settings-label-title"><a href="Create-WorkerGroup.html"> Create Worker Group </a></span>
+                            </div>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                <line x1="21" y1="7" x2="21" y2="13"/>
+                                <line x1="18" y1="10" x2="24" y2="10"/>
+                            </svg>
+                        </li>
+                        <li class="settings-row" style="list-style: none;">
+                            <div class="settings-label">
+                                <span class="settings-label-title"><a href="Approve-Task Completion.html"> Approve Task  </a></span>
+                            </div>
+
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+
+                        </li>
+                        <li class="settings-row" style="list-style: none;">
+                            <div class="settings-label">
+                                <span class="settings-label-title"><a href="updateTask.html"> Update Task </a></span>
+                            </div>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 4v6h-6"/>
+                                <path d="M1 20v-6h6"/>
+                                 <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/>
+                                 <path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/>
+                            </svg>
+                        </li>
+
+                        <li class="settings-row" style="list-style: none;">
+                            <div class="settings-label">
+                                <span class="settings-label-title"><a href="RemoveTask.html"> Remove Task </a></span>
+                            </div>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                <line x1="10" y1="11" x2="10" y2="17"/>
+                                 <line x1="14" y1="11" x2="14" y2="17"/>
+                            </svg>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Settings Content -->
+                <div class="glass-card">
+                    <div class="settings-tab-content active" id="tab-profile">
+                        <h3 class="settings-section-title">Assign New Task</h3>
+                        <div class="form-grid">
+                            <div class="form-group-settings full-width">
+                                <label>Select Active Employee</label>
+                                <select class="settings-select" id="employeeSelect">
+                                    <option value="">Select Employee</option>
+                                    <option value="">● John</option>
+                                    <option value="">● Mike</option>
+                                    <option value="">● Nolawi</option>
+                                    <option value="">○ Natnael</option>
+                                    <option value="">○ Anesu</option>
+                                    <option value="">○ Mohammed</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group-settings full-width">
+                                <label>Select Tasks To Assign</label>
+                                <select class="settings-select">
+                                    <option>Select Task</option>
+                                    <option>Land Preparation</option>
+                                    <option>Planting</option>
+                                    <option>Irrigation</option>
+                                    <option>Weeding</option>
+                                    <option>Pest Monitoring</option>
+                                    <option>Harvesting</option>
+                                    <option>Training Activities</option>
+                                    <option>Composting</option>
+                                    <option>Eco Toilets Monitoring</option>
+                                    <option>Record Keeping</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group-settings">
+                                <label>Due Date</label>
+                                <input type="date" style="width: 100%;">
+                            </div>
+
+                            <div class="form-group-settings">
+                                <label>Priority Level</label>
+                                <select class="settings-select">
+                                    <option>Select Priority</option>
+                                    <option>Low</option>
+                                    <option>Medium</option>
+                                    <option>High</option>
+                                    <option>Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3 class="settings-section-title">View Task Status</h3>
+                            <div class="table-wrapper">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Employee</th>
+                                            <th>Role</th>
+                                            <th>Status</th>
+                                            <th>Current Tasks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="table-user">
+                                                    <div class="table-avatar" style="background: #059669;">JF</div>
+                                                    John Farmer
+                                                </div>
+                                             </td>
+                                            <td>Field Worker</td>
+                                            <td><span class="status-badge completed">🟢 Active</span></td>
+                                            <td>3 tasks</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="table-user">
+                                                    <div class="table-avatar" style="background: #d4a574;">MO</div>
+                                                    Mike Operator
+                                                </div>
+                                             </td>
+                                            <td>Equipment Handler</td>
+                                            <td><span class="status-badge completed">🟢 Active</span></td>
+                                            <td>2 tasks</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="table-user">
+                                                    <div class="table-avatar" style="background: #e07a5f;">SG</div>
+                                                    Sarah Grower
+                                                </div>
+                                             </td>
+                                            <td>Crop Specialist</td>
+                                            <td><span class="status-badge completed">🟢 Active</span></td>
+                                            <td>1 task</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-primary" style="width: auto;">Assign Task</button>
+                            <button class="btn btn-secondary" style="width: auto;">Clear Form</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
