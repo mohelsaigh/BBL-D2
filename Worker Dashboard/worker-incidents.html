@@ -208,7 +208,8 @@
                 <li class="nav-section">
                     <span class="nav-section-title">Account</span>
                     <ul>
-                        <li class="nav-item"><a href="register.html" class="nav-link">
+                        <li class="nav-item">
+                            <a href="../Login and Register/Login.html" class="nav-link">
                             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
                             Logout
                         </a></li>
@@ -237,14 +238,14 @@
                         <label class="form-label-w">Incident Type <span>*</span></label>
                         <select class="form-select-w" id="incidentType">
                             <option value="">— Select type —</option>
-                            <option>🐛 Pest / Disease outbreak</option>
-                            <option>💧 Irrigation failure / Water leak</option>
-                            <option>🔧 Equipment breakdown</option>
-                            <option>🌿 Crop damage / Loss</option>
-                            <option>🤕 Worker injury / Near miss</option>
-                            <option>🌦 Weather damage</option>
-                            <option>🔒 Security concern</option>
-                            <option>⚠ Other field issue</option>
+                            <option>Pest / Disease outbreak</option>
+                            <option>Irrigation failure / Water leak</option>
+                            <option>Equipment breakdown</option>
+                            <option>Crop damage / Loss</option>
+                            <option>Worker injury / Near miss</option>
+                            <option>Weather damage</option>
+                            <option>Security concern</option>
+                            <option>Other field issue</option>
                         </select>
                     </div>
                     <div class="form-group-w">
@@ -284,17 +285,17 @@
 
                 <div class="severity-selector" style="margin-bottom:20px;">
                     <div class="severity-option" id="sev-low" onclick="selectSeverity('low')">
-                        <div class="severity-emoji">🟢</div>
+                        <div class="severity-emoji"></div>
                         <div class="severity-label">Low</div>
                         <div class="severity-desc">Minor, no immediate action</div>
                     </div>
                     <div class="severity-option selected-medium" id="sev-medium" onclick="selectSeverity('medium')">
-                        <div class="severity-emoji">🟡</div>
+                        <div class="severity-emoji"></div>
                         <div class="severity-label">Medium</div>
                         <div class="severity-desc">Needs attention soon</div>
                     </div>
                     <div class="severity-option" id="sev-high" onclick="selectSeverity('high')">
-                        <div class="severity-emoji">🔴</div>
+                        <div class="severity-emoji"></div>
                         <div class="severity-label">High</div>
                         <div class="severity-desc">Urgent — farm owner alerted</div>
                     </div>
@@ -343,8 +344,8 @@
                     <div class="report-title">Irrigation pipe burst — Block C east side</div>
                     <div class="report-meta">
                         <span>🗓 18 Apr 2026</span>
-                        <span>📍 Block C — Maize</span>
-                        <span>🔴 High severity</span>
+                        <span>Block C — Maize</span>
+                        <span>High severity</span>
                     </div>
                 </div>
                 <span class="report-status reviewing">Under Review</span>
@@ -358,8 +359,8 @@
                     <div class="report-title">Aphid infestation detected on spinach rows 3–5</div>
                     <div class="report-meta">
                         <span>🗓 15 Apr 2026</span>
-                        <span>📍 Field A — Spinach</span>
-                        <span>🟡 Medium severity</span>
+                        <span>Field A — Spinach</span>
+                        <span>Medium severity</span>
                     </div>
                 </div>
                 <span class="report-status open">Open</span>
@@ -373,8 +374,8 @@
                     <div class="report-title">Compost bin lid broken — Bay 2</div>
                     <div class="report-meta">
                         <span>🗓 10 Apr 2026</span>
-                        <span>📍 Compost Area A</span>
-                        <span>🟢 Low severity</span>
+                        <span>Compost Area A</span>
+                        <span>Low severity</span>
                     </div>
                 </div>
                 <span class="report-status resolved">Resolved</span>
