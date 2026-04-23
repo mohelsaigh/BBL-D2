@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmly - Equipment Usage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="templatemo-glass-admin-style.css">
+    <style>
+        .equip-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            backdrop-filter: blur(20px);
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .equip-card:hover { background: var(--glass-hover); }
+        .equip-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .equip-icon svg { width: 24px; height: 24px; }
+        .equip-icon.green { background: rgba(5,150,105,0.15); color: var(--emerald-light); }
+        .equip-icon.gold { background: rgba(212,165,116,0.15); color: var(--gold-light); }
+        .equip-icon.blue { background: rgba(14,165,233,0.15); color: var(--info); }
+        .equip-icon.red { background: rgba(220,38,38,0.12); color: #f87171; }
+        .equip-info { flex: 1; }
+        .equip-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .equip-id { font-size: 12px; color: var(--text-muted); }
+        .equip-meta { font-size: 12px; color: var(--text-secondary); margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .equip-actions { display: flex; gap: 8px; }
+        .action-btn {
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex; align-items: center; gap: 5px;
+        }
+        .action-btn svg { width: 13px; height: 13px; }
+        .action-btn:hover { background: var(--glass-hover); }
+        .action-btn.primary { background: rgba(5,150,105,0.2); border-color: rgba(52,211,153,0.3); color: var(--emerald-light); }
+        .action-btn.primary:hover { background: rgba(5,150,105,0.35); }
+        .action-btn.stop { background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.3); color: #f87171; }
+
+        .equip-status { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .equip-status.available { background: rgba(34,197,94,0.15); color: var(--success); border: 1px solid rgba(34,197,94,0.2); }
+        .equip-status.in-use { background: rgba(234,179,8,0.15); color: var(--warning); border: 1px solid rgba(234,179,8,0.2); }
+        .equip-status.maintenance { background: rgba(220,38,38,0.12); color: #f87171; border: 1px solid rgba(220,38,38,0.2); }
+
+        /* Active session banner */
+        .active-session {
+            background: rgba(5,150,105,0.1);
+            border: 1px solid rgba(52,211,153,0.25);
+            border-radius: 16px;
+            padding: 18px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .active-session-dot {
+            width: 12px; height: 12px;
+            background: var(--success);
+            border-radius: 50%;
+            flex-shrink: 0;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+        .active-session-info { flex: 1; }
+        .active-session-info strong { font-size: 14px; color: var(--emerald-light); display: block; margin-bottom: 2px; }
+        .active-session-info span { font-size: 12px; color: var(--text-secondary); }
+        .timer-display {
+            font-family: 'Space Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--emerald-light);
+            letter-spacing: 1px;
+        }
+
+        /* Log table */
+        .log-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: var(--card-padding);
+            backdrop-filter: blur(20px);
+            margin-bottom: 24px;
+        }
+        .log-card .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .log-card .card-title { font-size: 16px; font-weight: 600; }
+        .log-table { width: 100%; border-collapse: collapse; }
+        .log-table th { font-size: 12px; color: var(--text-muted); text-align: left; padding: 8px 0; border-bottom: 1px solid var(--glass-border); text-transform: uppercase; letter-spacing: 0.5px; }
+        .log-table td { font-size: 13px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+        .log-table tr:last-child td { border-bottom: none; }
+        .duration-badge { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-secondary); }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: var(--bg-gradient-2); border: 1px solid var(--glass-border); border-radius: 20px; padding: 28px; width: 100%; max-width: 480px; animation: modalIn 0.25s ease; }
+        @keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .modal-title { font-size: 17px; font-weight: 700; }
+        .modal-close { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .modal-close svg { width: 16px; height: 16px; }
+        .modal-section { margin-bottom: 16px; }
+        .modal-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .modal-select { width: 100%; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: 'Outfit', sans-serif; font-size: 14px; }
+        .modal-select option { background: #132419; }
+        .modal-input { width: 100%; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: 'Outfit', sans-serif; font-size: 14px; }
+        .modal-input:focus, .modal-select:focus { outline: none; border-color: var(--emerald-light); }
+        .modal-textarea { width: 100%; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; color: var(--text-primary); font-family: 'Outfit', sans-serif; font-size: 14px; resize: vertical; min-height: 80px; }
+        .modal-textarea:focus { outline: none; border-color: var(--emerald-light); }
+        .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .modal-btn { padding: 9px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; font-family: 'Outfit', sans-serif; cursor: pointer; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-primary); transition: all var(--transition-fast); }
+        .modal-btn:hover { background: var(--glass-hover); }
+        .modal-btn.confirm { background: rgba(5,150,105,0.25); border-color: rgba(52,211,153,0.4); color: var(--emerald-light); }
+        .modal-btn.danger { background: rgba(220,38,38,0.15); border-color: rgba(220,38,38,0.3); color: #f87171; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--bg-gradient-2); border: 1px solid var(--glass-border); border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; min-width: 280px; animation: toastIn 0.3s ease; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        @keyframes toastIn { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
+        .toast-icon { width: 20px; height: 20px; flex-shrink: 0; }
+        .toast-text { font-size: 13px; }
+        .toast.success .toast-icon { color: var(--success); }
+
+        .section-title { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 12px; display: flex; align-items: center; gap: 8px; }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: var(--glass-border); }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="dashboard">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <img src="../Login and Register/Media/Images/Farmly-removebg-preview.png" alt="Farmly Logo"
+                        style="width:45px; height:45px; object-fit:contain; mix-blend-mode:screen;">
+                </div>
+                <span class="logo-text">Farmly</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-section">
+                    <span class="nav-section-title">Worker Menu</span>
+                    <ul>
+                        <li class="nav-item"><a href="worker-dashboard.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                            Dashboard
+                        </a></li>
+                        <li class="nav-item"><a href="worker-tasks.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+                            My Tasks
+                        </a></li>
+                        <li class="nav-item"><a href="worker-equipment.html" class="nav-link active">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                            Equipment Usage
+                        </a></li>
+                        <li class="nav-item"><a href="worker-incidents.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            Report Incident
+                        </a></li>
+                    </ul>
+                </li>
+                <li class="nav-section">
+                    <span class="nav-section-title">Account</span>
+                    <ul>
+                        <li class="nav-item"><a href="register.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                            Logout
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <nav class="navbar">
+                <h1 class="page-title">Equipment Usage</h1>
+                <div class="navbar-right">
+                    <button class="nav-btn" id="theme-toggle">
+                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Active Session Banner -->
+            <div class="active-session" id="activeSessionBanner" style="display:none;">
+                <div class="active-session-dot"></div>
+                <div class="active-session-info">
+                    <strong id="activeEquipName">Hand Tractor — HT-002</strong>
+                    <span id="activeTaskLink">Task: Land Preparation — Field B</span>
+                </div>
+                <div>
+                    <div style="font-size:11px; color:var(--text-muted); text-align:right; margin-bottom:2px;">Elapsed Time</div>
+                    <div class="timer-display" id="timerDisplay">00:00:00</div>
+                </div>
+                <button class="action-btn stop" onclick="stopSession()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                    Stop & Log
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <section class="stats-grid" style="margin-bottom:24px;">
+                <div class="glass-card glass-card-3d stat-card">
+                    <div class="stat-card-inner">
+                        <div class="stat-info"><h3>Equipment Used Today</h3><div class="stat-value">2</div></div>
+                        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+                    </div>
+                </div>
+                <div class="glass-card glass-card-3d stat-card">
+                    <div class="stat-card-inner">
+                        <div class="stat-info"><h3>Total Hours This Week</h3><div class="stat-value">8.5</div></div>
+                        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                    </div>
+                </div>
+                <div class="glass-card glass-card-3d stat-card">
+                    <div class="stat-card-inner">
+                        <div class="stat-info"><h3>Logs Submitted</h3><div class="stat-value">12</div></div>
+                        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--info)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Available Equipment -->
+            <div class="section-title">Available Equipment</div>
+
+            <div class="equip-card">
+                <div class="equip-icon green">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                </div>
+                <div class="equip-info">
+                    <div class="equip-name">Hand Tractor</div>
+                    <div class="equip-id">ID: HT-002 · Shed B</div>
+                    <div class="equip-meta">
+                        <span>Last used: Yesterday by Sipho M.</span>
+                        <span>Engine hrs: 342</span>
+                    </div>
+                </div>
+                <span class="equip-status available">Available</span>
+                <div class="equip-actions">
+                    <button class="action-btn primary" onclick="openStartModal('Hand Tractor', 'HT-002')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        Start Session
+                    </button>
+                </div>
+            </div>
+
+            <div class="equip-card">
+                <div class="equip-icon blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div class="equip-info">
+                    <div class="equip-name">Irrigation Pump — Main</div>
+                    <div class="equip-id">ID: IP-001 · Pump House</div>
+                    <div class="equip-meta">
+                        <span>Last used: Today 06:30</span>
+                        <span>Run hours: 1,204</span>
+                    </div>
+                </div>
+                <span class="equip-status available">Available</span>
+                <div class="equip-actions">
+                    <button class="action-btn primary" onclick="openStartModal('Irrigation Pump — Main', 'IP-001')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        Start Session
+                    </button>
+                </div>
+            </div>
+
+            <!-- In Use / Unavailable -->
+            <div class="section-title">Currently In Use</div>
+
+            <div class="equip-card" style="opacity:0.7;">
+                <div class="equip-icon gold">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </div>
+                <div class="equip-info">
+                    <div class="equip-name">Wheelbarrow Set A</div>
+                    <div class="equip-id">ID: WB-003 · Field Area</div>
+                    <div class="equip-meta">
+                        <span>In use by: Nomsa K. since 08:15</span>
+                        <span>Task: Compost distribution</span>
+                    </div>
+                </div>
+                <span class="equip-status in-use">In Use</span>
+            </div>
+
+            <div class="equip-card" style="opacity:0.7;">
+                <div class="equip-icon red">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div class="equip-info">
+                    <div class="equip-name">Sprayer — Backpack</div>
+                    <div class="equip-id">ID: SP-004 · Equipment Room</div>
+                    <div class="equip-meta">
+                        <span>Under maintenance</span>
+                        <span>Est. return: Tomorrow</span>
+                    </div>
+                </div>
+                <span class="equip-status maintenance">Maintenance</span>
+            </div>
+
+            <!-- Usage Log -->
+            <div class="log-card">
+                <div class="card-header">
+                    <h2 class="card-title">My Usage Log — This Week</h2>
+                    <span style="font-size:12px; color:var(--text-muted);">Apr 18–22, 2026</span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>Equipment</th>
+                                <th>Task</th>
+                                <th>Date</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Hand Tractor (HT-002)</td>
+                                <td>Land Prep — Field B</td>
+                                <td>22 Apr</td>
+                                <td>07:00</td>
+                                <td>09:30</td>
+                                <td><span class="duration-badge">2h 30m</span></td>
+                            </tr>
+                            <tr>
+                                <td>Irrigation Pump (IP-001)</td>
+                                <td>Irrigate Maize — Block C</td>
+                                <td>21 Apr</td>
+                                <td>06:00</td>
+                                <td>08:00</td>
+                                <td><span class="duration-badge">2h 00m</span></td>
+                            </tr>
+                            <tr>
+                                <td>Wheelbarrow (WB-003)</td>
+                                <td>Compost Bay Turning</td>
+                                <td>21 Apr</td>
+                                <td>14:00</td>
+                                <td>15:30</td>
+                                <td><span class="duration-badge">1h 30m</span></td>
+                            </tr>
+                            <tr>
+                                <td>Hand Tractor (HT-002)</td>
+                                <td>Tomato Bed Prep</td>
+                                <td>20 Apr</td>
+                                <td>08:30</td>
+                                <td>11:00</td>
+                                <td><span class="duration-badge">2h 30m</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <button class="mobile-menu-toggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+    </button>
+
+    <!-- Start Session Modal -->
+    <div class="modal-overlay" id="startModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Start Equipment Session</span>
+                <button class="modal-close" onclick="closeModal('startModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Equipment</div>
+                <div id="startEquipName" style="font-size:15px; font-weight:600; color:var(--emerald-light); padding: 10px 0;"></div>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Link to Task</div>
+                <select class="modal-select" id="linkedTask">
+                    <option>Irrigate Maize Field — Block C</option>
+                    <option>Weed Control — Tomato Beds</option>
+                    <option>Compost Bay Turning</option>
+                    <option>Pest Monitoring — Spinach Rows</option>
+                    <option>Other / General Maintenance</option>
+                </select>
+            </div>
+            <div class="modal-section">
+                <div class="two-col">
+                    <div><div class="modal-label">Start Time</div><input type="time" class="modal-input" id="startTime"></div>
+                    <div><div class="modal-label">Date</div><input type="date" class="modal-input" id="startDate"></div>
+                </div>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Pre-use Condition Check</div>
+                <select class="modal-select">
+                    <option>✅ Good condition — no issues</option>
+                    <option>⚠ Minor wear — noted but operational</option>
+                    <option>🚫 Issue found — need to report</option>
+                </select>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Notes (optional)</div>
+                <textarea class="modal-textarea" placeholder="Any notes before starting..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" onclick="closeModal('startModal')">Cancel</button>
+                <button class="modal-btn confirm" onclick="startSession()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;display:inline;margin-right:4px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Start Session
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stop Session Modal -->
+    <div class="modal-overlay" id="stopModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">End Equipment Session</span>
+                <button class="modal-close" onclick="closeModal('stopModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Equipment</div>
+                <div id="stopEquipName" style="font-size:15px; font-weight:600; color:var(--emerald-light); padding:10px 0;"></div>
+            </div>
+            <div class="modal-section">
+                <div class="two-col">
+                    <div><div class="modal-label">End Time</div><input type="time" class="modal-input" id="endTime"></div>
+                    <div><div class="modal-label">Duration</div><input type="text" class="modal-input" id="calcDuration" readonly placeholder="Auto-calculated" style="color:var(--text-muted);"></div>
+                </div>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Post-use Condition</div>
+                <select class="modal-select">
+                    <option>✅ Returned in good condition</option>
+                    <option>⚠ Minor issue found during use — logged</option>
+                    <option>🚫 Equipment damaged — needs maintenance</option>
+                </select>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Completion Notes</div>
+                <textarea class="modal-textarea" placeholder="Describe work done, fuel used, any issues..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" onclick="closeModal('stopModal')">Cancel</button>
+                <button class="modal-btn confirm" onclick="confirmStop()">Submit Log</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="templatemo-glass-admin-script.js"></script>
+    <script>
+        let timerInterval = null;
+        let startTimestamp = null;
+        let activeEquip = '';
+
+        // Set today
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+        const timeStr = now.toTimeString().slice(0,5);
+        if (document.getElementById('startDate')) document.getElementById('startDate').value = todayStr;
+        if (document.getElementById('startTime')) document.getElementById('startTime').value = timeStr;
+
+        function openModal(id) { document.getElementById(id).classList.add('open'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+        function openStartModal(name, id) {
+            document.getElementById('startEquipName').textContent = `${name} · ID: ${id}`;
+            activeEquip = name;
+            document.getElementById('startTime').value = new Date().toTimeString().slice(0,5);
+            openModal('startModal');
+        }
+
+        function startSession() {
+            closeModal('startModal');
+            startTimestamp = Date.now();
+            document.getElementById('activeEquipName').textContent = activeEquip;
+            const task = document.getElementById('linkedTask').value;
+            document.getElementById('activeTaskLink').textContent = `Task: ${task}`;
+            document.getElementById('activeSessionBanner').style.display = 'flex';
+            timerInterval = setInterval(updateTimer, 1000);
+            showToast(`Session started for ${activeEquip}`, 'success');
+        }
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTimestamp) / 1000);
+            const h = String(Math.floor(elapsed/3600)).padStart(2,'0');
+            const m = String(Math.floor((elapsed%3600)/60)).padStart(2,'0');
+            const s = String(elapsed%60).padStart(2,'0');
+            document.getElementById('timerDisplay').textContent = `${h}:${m}:${s}`;
+        }
+
+        function stopSession() {
+            clearInterval(timerInterval);
+            document.getElementById('stopEquipName').textContent = activeEquip;
+            const endT = new Date().toTimeString().slice(0,5);
+            document.getElementById('endTime').value = endT;
+            const elapsed = Math.floor((Date.now() - startTimestamp) / 1000);
+            const h = Math.floor(elapsed/3600);
+            const m = Math.floor((elapsed%3600)/60);
+            document.getElementById('calcDuration').value = h > 0 ? `${h}h ${m}m` : `${m}m`;
+            openModal('stopModal');
+        }
+
+        function confirmStop() {
+            document.getElementById('activeSessionBanner').style.display = 'none';
+            closeModal('stopModal');
+            showToast('Equipment usage logged successfully', 'success');
+        }
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span class="toast-text">${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(o => { o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }); });
+    </script>
+</body>
+</html>

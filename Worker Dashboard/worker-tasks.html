@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmly - My Tasks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="templatemo-glass-admin-style.css">
+    <style>
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 7px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .filter-btn.active, .filter-btn:hover {
+            background: rgba(5,150,105,0.2);
+            border-color: rgba(52,211,153,0.3);
+            color: var(--emerald-light);
+        }
+        .task-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            backdrop-filter: blur(20px);
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+        .task-card:hover { background: var(--glass-hover); }
+        .task-card-left-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 16px 0 0 16px; }
+        .task-card-left-bar.high { background: var(--danger); }
+        .task-card-left-bar.medium { background: var(--warning); }
+        .task-card-left-bar.low { background: var(--success); }
+        .task-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+        .task-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .task-meta { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .task-meta span { display: flex; align-items: center; gap: 4px; }
+        .task-meta svg { width: 12px; height: 12px; }
+        .task-desc { font-size: 13px; color: var(--text-secondary); margin: 10px 0 14px; line-height: 1.5; }
+        .task-card-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .action-btn {
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex; align-items: center; gap: 5px;
+        }
+        .action-btn svg { width: 12px; height: 12px; }
+        .action-btn:hover { background: var(--glass-hover); }
+        .action-btn.primary { background: rgba(5,150,105,0.2); border-color: rgba(52,211,153,0.3); color: var(--emerald-light); }
+        .action-btn.primary:hover { background: rgba(5,150,105,0.35); }
+        .action-btn.warn { background: rgba(234,179,8,0.1); border-color: rgba(234,179,8,0.3); color: var(--warning); }
+        .priority-chip { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        .priority-chip.high { background: rgba(220,38,38,0.15); color: #ef4444; border: 1px solid rgba(220,38,38,0.25); }
+        .priority-chip.medium { background: rgba(234,179,8,0.15); color: var(--warning); border: 1px solid rgba(234,179,8,0.25); }
+        .priority-chip.low { background: rgba(34,197,94,0.15); color: var(--success); border: 1px solid rgba(34,197,94,0.25); }
+        .priority-chip.done { background: rgba(14,165,233,0.15); color: var(--info); border: 1px solid rgba(14,165,233,0.25); }
+
+        .task-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 20px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .task-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--glass-border);
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .checklist-item:last-child { border-bottom: none; }
+        .checklist-item input[type="checkbox"] { accent-color: var(--emerald); width: 16px; height: 16px; cursor: pointer; }
+        .checklist-item.checked { text-decoration: line-through; color: var(--text-muted); }
+
+        /* Modal styles */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: var(--bg-gradient-2); border: 1px solid var(--glass-border); border-radius: 20px; padding: 28px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; animation: modalIn 0.25s ease; }
+        @keyframes modalIn { from { opacity:0; transform:scale(0.95) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .modal-title { font-size: 17px; font-weight: 700; }
+        .modal-close { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .modal-close svg { width: 16px; height: 16px; }
+        .modal-section { margin-bottom: 18px; }
+        .modal-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .modal-value { font-size: 14px; }
+        .modal-textarea { width: 100%; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 12px; color: var(--text-primary); font-family: 'Outfit', sans-serif; font-size: 14px; resize: vertical; min-height: 90px; }
+        .modal-textarea:focus { outline: none; border-color: var(--emerald-light); }
+        .modal-select { width: 100%; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: 'Outfit', sans-serif; font-size: 14px; }
+        .modal-select option { background: #132419; }
+        .modal-input { width: 100%; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-family: 'Outfit', sans-serif; font-size: 14px; }
+        .modal-input:focus { outline: none; border-color: var(--emerald-light); }
+        .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .modal-btn { padding: 9px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; font-family: 'Outfit', sans-serif; cursor: pointer; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-primary); transition: all var(--transition-fast); }
+        .modal-btn:hover { background: var(--glass-hover); }
+        .modal-btn.confirm { background: rgba(5,150,105,0.25); border-color: rgba(52,211,153,0.4); color: var(--emerald-light); }
+        .modal-btn.confirm:hover { background: rgba(5,150,105,0.4); }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .file-upload-area { border: 2px dashed var(--glass-border); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all var(--transition-fast); }
+        .file-upload-area:hover { border-color: var(--emerald-light); background: rgba(52,211,153,0.05); }
+        .file-upload-area p { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--bg-gradient-2); border: 1px solid var(--glass-border); border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; min-width: 280px; animation: toastIn 0.3s ease; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        @keyframes toastIn { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
+        .toast-icon { width: 20px; height: 20px; flex-shrink: 0; }
+        .toast-text { font-size: 13px; }
+        .toast.success .toast-icon { color: var(--success); }
+
+        .nav-link .notif-dot { width: 7px; height: 7px; background: var(--danger); border-radius: 50%; margin-left: auto; }
+
+        /* Detail panel */
+        .task-detail-info {
+            background: rgba(5,150,105,0.06);
+            border: 1px solid rgba(52,211,153,0.15);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+        .task-detail-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .task-detail-row:last-child { border-bottom: none; }
+        .task-detail-row span:first-child { color: var(--text-muted); }
+        .task-detail-row span:last-child { font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="dashboard">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                      <img src="../Login and Register/Media/Images/Farmly-removebg-preview.png" alt="Farmly Logo"
+                        style="width:45px; height:45px; object-fit:contain; mix-blend-mode:screen;">
+                </div>
+                <span class="logo-text">Farmly</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-section">
+                    <span class="nav-section-title">Worker Menu</span>
+                    <ul>
+                        <li class="nav-item"><a href="worker-dashboard.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                            Dashboard
+                        </a></li>
+                        <li class="nav-item"><a href="worker-tasks.html" class="nav-link active">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>
+                            My Tasks
+                            <span class="notif-dot"></span>
+                        </a></li>
+                        <li class="nav-item"><a href="worker-equipment.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                            Equipment Usage
+                        </a></li>
+                        <li class="nav-item"><a href="worker-incidents.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            Report Incident
+                        </a></li>
+                    </ul>
+                </li>
+                <li class="nav-section">
+                    <span class="nav-section-title">Account</span>
+                    <ul>
+                        <li class="nav-item"><a href="register.html" class="nav-link">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                            Logout
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <nav class="navbar">
+                <h1 class="page-title">My Tasks</h1>
+                <div class="navbar-right">
+                    <button class="nav-btn" id="theme-toggle">
+                        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Filter Tabs -->
+            <div class="filter-row">
+                <button class="filter-btn active" onclick="filterTasks('all', this)">All Tasks (6)</button>
+                <button class="filter-btn" onclick="filterTasks('overdue', this)">⚠ Overdue (1)</button>
+                <button class="filter-btn" onclick="filterTasks('in_progress', this)">🔄 In Progress (2)</button>
+                <button class="filter-btn" onclick="filterTasks('pending', this)">⏳ Pending (2)</button>
+                <button class="filter-btn" onclick="filterTasks('completed', this)">✅ Completed (1)</button>
+            </div>
+
+            <!-- OVERDUE -->
+            <div class="task-section-title" data-group="overdue">Overdue</div>
+
+            <div class="task-card" data-status="overdue">
+                <div class="task-card-left-bar high"></div>
+                <div class="task-card-top">
+                    <div>
+                        <div class="task-title">Irrigate Maize Field — Block C</div>
+                        <div class="task-meta">
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Due: Today 08:00</span>
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Block C — 2.5ha</span>
+                            <span>👷 Assigned by: Farm Owner</span>
+                        </div>
+                    </div>
+                    <span class="priority-chip high">Overdue</span>
+                </div>
+                <p class="task-desc">Morning irrigation required for the maize section. Check soil moisture sensors before and after. Estimated 2 hours. Use tractor-mounted irrigation arm.</p>
+                <div class="task-card-actions">
+                    <button class="action-btn primary" onclick="openStatusModal('Irrigate Maize Field — Block C', 'statusModal')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Update Status
+                    </button>
+                    <button class="action-btn" onclick="openPhotoModal('Irrigate Maize Field — Block C')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Add Photo
+                    </button>
+                    <button class="action-btn warn" onclick="openRescheduleModal('Irrigate Maize Field — Block C')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>Request Reschedule
+                    </button>
+                    <button class="action-btn" onclick="openTaskDetail('Irrigate Maize Field — Block C', 'Block C', 'Today 08:00', 'Irrigation', 'Overdue', 'Farm Owner')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- IN PROGRESS -->
+            <div class="task-section-title" data-group="in_progress">In Progress</div>
+
+            <div class="task-card" data-status="in_progress">
+                <div class="task-card-left-bar medium"></div>
+                <div class="task-card-top">
+                    <div>
+                        <div class="task-title">Weed Control — Tomato Beds</div>
+                        <div class="task-meta">
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Due: Today 10:00</span>
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Greenhouse Row 4–7</span>
+                        </div>
+                    </div>
+                    <span class="priority-chip medium">In Progress</span>
+                </div>
+                <p class="task-desc">Manual weeding of tomato beds rows 4 through 7. Use gloves and avoid disturbing root systems near drip lines.</p>
+                <div class="task-card-actions">
+                    <button class="action-btn primary" onclick="openStatusModal('Weed Control — Tomato Beds', 'statusModal')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Update Status
+                    </button>
+                    <button class="action-btn" onclick="openPhotoModal('Weed Control — Tomato Beds')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Add Photo
+                    </button>
+                    <button class="action-btn" onclick="openTaskDetail('Weed Control — Tomato Beds', 'Greenhouse Row 4–7', 'Today 10:00', 'Weeding', 'In Progress', 'Team Leader')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Details
+                    </button>
+                </div>
+            </div>
+
+            <div class="task-card" data-status="in_progress">
+                <div class="task-card-left-bar medium"></div>
+                <div class="task-card-top">
+                    <div>
+                        <div class="task-title">Pest Monitoring — Spinach Rows</div>
+                        <div class="task-meta">
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Due: Today 12:00</span>
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Field A — Spinach</span>
+                        </div>
+                    </div>
+                    <span class="priority-chip medium">In Progress</span>
+                </div>
+                <p class="task-desc">Inspect all spinach rows for aphids and leaf miners. Record observations on the checklist. Apply organic spray if infestation detected on more than 10% of plants.</p>
+                <div class="task-card-actions">
+                    <button class="action-btn primary" onclick="openStatusModal('Pest Monitoring — Spinach Rows', 'statusModal')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Update Status
+                    </button>
+                    <button class="action-btn" onclick="openPhotoModal('Pest Monitoring — Spinach Rows')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Add Photo
+                    </button>
+                    <button class="action-btn warn" onclick="openRescheduleModal('Pest Monitoring — Spinach Rows')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>Reschedule
+                    </button>
+                </div>
+            </div>
+
+            <!-- PENDING -->
+            <div class="task-section-title" data-group="pending">Pending</div>
+
+            <div class="task-card" data-status="pending">
+                <div class="task-card-left-bar low"></div>
+                <div class="task-card-top">
+                    <div>
+                        <div class="task-title">Compost Bay Turning</div>
+                        <div class="task-meta">
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Due: Today 14:00</span>
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Compost Area A</span>
+                        </div>
+                    </div>
+                    <span class="priority-chip low">Pending</span>
+                </div>
+                <p class="task-desc">Turn compost bay using the designated fork. Add water if dry. Record temperature reading in the logbook on site.</p>
+                <div class="task-card-actions">
+                    <button class="action-btn primary" onclick="openStatusModal('Compost Bay Turning', 'statusModal')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Update Status
+                    </button>
+                    <button class="action-btn" onclick="openPhotoModal('Compost Bay Turning')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Add Photo
+                    </button>
+                    <button class="action-btn warn" onclick="openRescheduleModal('Compost Bay Turning')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>Reschedule
+                    </button>
+                </div>
+            </div>
+
+            <div class="task-card" data-status="pending">
+                <div class="task-card-left-bar low"></div>
+                <div class="task-card-top">
+                    <div>
+                        <div class="task-title">Eco Toilet Monitoring Check</div>
+                        <div class="task-meta">
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Due: Tomorrow 07:30</span>
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Farm Perimeter</span>
+                        </div>
+                    </div>
+                    <span class="priority-chip low">Pending</span>
+                </div>
+                <p class="task-desc">Inspect all 4 eco toilets on the farm perimeter. Check levels, cleanliness, and any structural issues. Report any problems immediately.</p>
+                <div class="task-card-actions">
+                    <button class="action-btn primary" onclick="openStatusModal('Eco Toilet Monitoring Check', 'statusModal')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Update Status
+                    </button>
+                    <button class="action-btn" onclick="openPhotoModal('Eco Toilet Monitoring Check')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Add Photo
+                    </button>
+                </div>
+            </div>
+
+            <!-- COMPLETED -->
+            <div class="task-section-title" data-group="completed">Completed (Awaiting Approval)</div>
+
+            <div class="task-card" data-status="completed" style="opacity:0.75;">
+                <div class="task-card-left-bar" style="background: var(--info);"></div>
+                <div class="task-card-top">
+                    <div>
+                        <div class="task-title">Land Preparation — Field B</div>
+                        <div class="task-meta">
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Completed: Yesterday 15:30</span>
+                            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Field B — 1.8ha</span>
+                        </div>
+                    </div>
+                    <span class="priority-chip done">Awaiting Approval</span>
+                </div>
+                <p class="task-desc">Tilling and soil loosening completed using the hand tractor. 3 photos submitted. Notes: soil was drier than expected, recommend irrigation before planting.</p>
+                <div class="task-card-actions">
+                    <button class="action-btn" onclick="showToast('Waiting for farm owner to review and approve.', 'info')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending Review
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <button class="mobile-menu-toggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+    </button>
+
+    <!-- Status Modal -->
+    <div class="modal-overlay" id="statusModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Update Task Status</span>
+                <button class="modal-close" onclick="closeModal('statusModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Task</div>
+                <div class="modal-value" id="statusTaskName" style="font-weight:600; color:var(--emerald-light);"></div>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">New Status</div>
+                <select class="modal-select">
+                    <option>🔄 In Progress</option>
+                    <option>✅ Completed — Ready for Approval</option>
+                    <option>🚫 Blocked / Cannot Complete</option>
+                </select>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Progress Notes</div>
+                <textarea class="modal-textarea" placeholder="Describe what was done, any issues encountered, or reasons for blockage..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" onclick="closeModal('statusModal')">Cancel</button>
+                <button class="modal-btn confirm" onclick="submitStatus()">Submit Update</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo Modal -->
+    <div class="modal-overlay" id="photoModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Upload Photo Evidence</span>
+                <button class="modal-close" onclick="closeModal('photoModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Task</div>
+                <div class="modal-value" id="photoTaskName" style="font-weight:600; color:var(--emerald-light);"></div>
+            </div>
+            <div class="modal-section">
+                <label class="file-upload-area" for="photoInputTasks">
+                    <div style="color:var(--emerald-light); margin-bottom:8px;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    </div>
+                    <p>Tap to take photo or upload from gallery</p>
+                    <p style="font-size:11px; margin-top:4px;">JPG, PNG up to 10MB</p>
+                    <input type="file" id="photoInputTasks" accept="image/*" style="display:none" onchange="previewPhotoT(event)">
+                </label>
+                <div id="photoPreviewT" style="margin-top:12px; display:none;">
+                    <img id="previewImgT" style="width:100%; border-radius:10px; max-height:200px; object-fit:cover;" src="" alt="Preview">
+                </div>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Caption</div>
+                <input type="text" class="modal-input" placeholder="Describe what the photo shows...">
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" onclick="closeModal('photoModal')">Cancel</button>
+                <button class="modal-btn confirm" onclick="submitPhoto()">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reschedule Modal -->
+    <div class="modal-overlay" id="rescheduleModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Request Reschedule</span>
+                <button class="modal-close" onclick="closeModal('rescheduleModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Task</div>
+                <div class="modal-value" id="rescheduleTaskName" style="font-weight:600; color:var(--emerald-light);"></div>
+            </div>
+            <div class="modal-section">
+                <div class="two-col">
+                    <div><div class="modal-label">New Date</div><input type="date" class="modal-input"></div>
+                    <div><div class="modal-label">New Time</div><input type="time" class="modal-input"></div>
+                </div>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Reason</div>
+                <select class="modal-select">
+                    <option>Equipment unavailable</option>
+                    <option>Weather conditions</option>
+                    <option>Resource shortage</option>
+                    <option>Health/personal emergency</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Additional Notes</div>
+                <textarea class="modal-textarea" placeholder="Explain why a reschedule is needed..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" onclick="closeModal('rescheduleModal')">Cancel</button>
+                <button class="modal-btn confirm" onclick="submitReschedule()">Send Request</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Detail Modal -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title" id="detailTaskName"></span>
+                <button class="modal-close" onclick="closeModal('detailModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+            <div class="task-detail-info">
+                <div class="task-detail-row"><span>Location</span><span id="detailLocation"></span></div>
+                <div class="task-detail-row"><span>Due</span><span id="detailDue"></span></div>
+                <div class="task-detail-row"><span>Category</span><span id="detailCategory"></span></div>
+                <div class="task-detail-row"><span>Status</span><span id="detailStatus"></span></div>
+                <div class="task-detail-row"><span>Assigned by</span><span id="detailAssigned"></span></div>
+            </div>
+            <div class="modal-section">
+                <div class="modal-label">Field Checklist</div>
+                <div>
+                    <label class="checklist-item"><input type="checkbox"> Safety equipment checked</label>
+                    <label class="checklist-item"><input type="checkbox"> Tools/equipment collected</label>
+                    <label class="checklist-item"><input type="checkbox"> Task area inspected</label>
+                    <label class="checklist-item"><input type="checkbox"> Work completed</label>
+                    <label class="checklist-item"><input type="checkbox"> Area left clean and safe</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" onclick="closeModal('detailModal')">Close</button>
+                <button class="modal-btn confirm" onclick="closeModal('detailModal'); showToast('Checklist saved', 'success')">Save Checklist</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="templatemo-glass-admin-script.js"></script>
+    <script>
+        function openModal(id) { document.getElementById(id).classList.add('open'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+        function openStatusModal(name) {
+            document.getElementById('statusTaskName').textContent = name;
+            openModal('statusModal');
+        }
+        function openPhotoModal(name) {
+            document.getElementById('photoTaskName').textContent = name;
+            document.getElementById('photoPreviewT').style.display = 'none';
+            openModal('photoModal');
+        }
+        function openRescheduleModal(name) {
+            document.getElementById('rescheduleTaskName').textContent = name;
+            openModal('rescheduleModal');
+        }
+        function openTaskDetail(name, loc, due, cat, status, assigned) {
+            document.getElementById('detailTaskName').textContent = name;
+            document.getElementById('detailLocation').textContent = loc;
+            document.getElementById('detailDue').textContent = due;
+            document.getElementById('detailCategory').textContent = cat;
+            document.getElementById('detailStatus').textContent = status;
+            document.getElementById('detailAssigned').textContent = assigned;
+            openModal('detailModal');
+        }
+
+        function previewPhotoT(e) {
+            const file = e.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => { document.getElementById('previewImgT').src = ev.target.result; document.getElementById('photoPreviewT').style.display = 'block'; };
+            reader.readAsDataURL(file);
+        }
+        function submitStatus() { closeModal('statusModal'); showToast('Task status updated successfully', 'success'); }
+        function submitPhoto() { closeModal('photoModal'); showToast('Photo uploaded and attached', 'success'); }
+        function submitReschedule() { closeModal('rescheduleModal'); showToast('Reschedule request sent to farm owner', 'success'); }
+
+        function filterTasks(status, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.task-card').forEach(card => {
+                card.style.display = (status === 'all' || card.dataset.status === status) ? 'block' : 'none';
+            });
+            document.querySelectorAll('.task-section-title').forEach(title => {
+                const group = title.dataset.group;
+                const hasVisible = document.querySelector(`.task-card[data-status="${group}"]`)?.style.display !== 'none';
+                title.style.display = (status === 'all' || status === group) ? 'flex' : 'none';
+            });
+        }
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+            toast.innerHTML = `${icon}<span class="toast-text">${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(o => { o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }); });
+    </script>
+</body>
+</html>
